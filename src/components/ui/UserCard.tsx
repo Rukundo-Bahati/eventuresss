@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { Button } from "./button";
-import UserData from "../UserData"; // Import UserData component
+import React from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { CalendarIcon, MapPinIcon, UsersIcon } from "@heroicons/react/24/outline";
 
 interface UserCardProps {
   title: string;
@@ -8,8 +9,9 @@ interface UserCardProps {
   seats: number;
   date: string;
   image: string;
-  onBookSeat: (userData: { firstName: string; lastName: string; email: string }) => void; // Update function to include user data
-  isSoldOut: boolean;
+  price: number;
+  location: string;
+  category: string;
 }
 
 const UserCard: React.FC<UserCardProps> = ({
@@ -18,45 +20,72 @@ const UserCard: React.FC<UserCardProps> = ({
   seats,
   date,
   image,
-  onBookSeat,
-  isSoldOut,
+  price,
+  location,
+  category,
 }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleBookSeat = () => {
-    if (!isSoldOut) {
-      setIsModalOpen(true);
-    }
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
+  const formattedDate = new Date(date).toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 
   return (
-    <div className="rounded-lg shadow-lg overflow-hidden bg-white transform hover:scale-105 transition duration-300 ease-in-out">
-      <img src={image} alt={title} className="w-full h-48 object-cover" />
-      <div className="p-6">
-        <h3 className="text-2xl font-bold text-blue-600 mb-2">{title}</h3>
-        <p className="text-gray-700 mb-4">{description}</p>
-        <p className="text-gray-500 text-sm mb-1">Date: {date}</p>
-        <p className="text-gray-500 text-sm mb-4">
-          Available Seats: <span className="font-bold">{seats}</span>
-        </p>
-        <Button
-          onClick={handleBookSeat}
-          disabled={isSoldOut}
-          className={`w-full py-2 rounded-lg text-white ${
-            isSoldOut ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
-          } transition duration-300`}
-        >
-          {isSoldOut ? "Sold Out" : "Book Now"}
-        </Button>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+    >
+      <div className="relative h-48 w-full">
+        <Image
+          src={image}
+          alt={title}
+          fill
+          className="object-cover"
+        />
+        <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+          ${price}
+        </div>
+        <div className="absolute top-4 left-4 bg-white/90 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+          {category}
+        </div>
       </div>
-      {isModalOpen && (
-        <UserData onClose={handleModalClose} onBookSeat={onBookSeat} />
-      )}
-    </div>
+
+      <div className="p-6">
+        <h3 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-1">
+          {title}
+        </h3>
+        <p className="text-gray-600 mb-4 line-clamp-2">{description}</p>
+
+        <div className="space-y-3 mb-6">
+          <div className="flex items-center text-gray-600">
+            <CalendarIcon className="h-5 w-5 mr-2" />
+            <span>{formattedDate}</span>
+          </div>
+          <div className="flex items-center text-gray-600">
+            <MapPinIcon className="h-5 w-5 mr-2" />
+            <span className="line-clamp-1">{location}</span>
+          </div>
+          <div className="flex items-center text-gray-600">
+            <UsersIcon className="h-5 w-5 mr-2" />
+            <span>{seats} seats available</span>
+          </div>
+        </div>
+
+        <button
+          className={`w-full py-3 px-4 rounded-lg font-medium transition duration-300 ${
+            seats > 0
+              ? "bg-blue-600 text-white hover:bg-blue-700"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
+          disabled={seats === 0}
+        >
+          {seats > 0 ? "Book Now" : "Sold Out"}
+        </button>
+      </div>
+    </motion.div>
   );
 };
 

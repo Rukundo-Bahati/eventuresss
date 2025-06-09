@@ -1,37 +1,44 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Eventure",
-  description: "all about events",
+  title: "Eventure - Discover Amazing Events",
+  description: "Find and book tickets for the best events in your area. From tech conferences to music festivals, we've got you covered.",
+  keywords: "events, tickets, booking, conferences, festivals, concerts",
+  authors: [{ name: "Eventure Team" }],
+  openGraph: {
+    title: "Eventure - Discover Amazing Events",
+    description: "Find and book tickets for the best events in your area.",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <body style={{ fontFamily: 'Product Sans, sans-serif', fontWeight: 400 }}
-      >
-         <SidebarProvider> {/* Wrap the entire layout */}
-          {children}
-        </SidebarProvider>
-        {/* {children} */}
+      <body className={inter.className}>
+        {children}
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </body>
     </html>
   );
