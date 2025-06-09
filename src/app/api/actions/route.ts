@@ -1,35 +1,52 @@
 // pages/api/events.js
 
 import { NextRequest, NextResponse } from 'next/server';
-import { connectToDatabase } from '@/lib/mongodb'; // Adjust the path if necessary
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing Supabase environment variables');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function GET(req: NextRequest) {
   try {
-    // Use the connectToDatabase function to get the client and database
-    const { db } = await connectToDatabase();
-    const eventsCollection = db.collection('eventuredb');
-    const usersCollection = db.collection('users'); // Assuming you have a users collection
-
     // Fetch events and stats
-    const totalEvents = await eventsCollection.countDocuments();
-    const registeredUsers = await usersCollection.countDocuments();
-    const upcomingEvents = await eventsCollection.countDocuments({ date: { $gte: new Date() } });
+    const { count: totalEvents } = await supabase
+      .from('events')
+      .select('*', { count: 'exact', head: true });
 
-    // Fetch recent activities (You can modify this to pull real activities from your collections)
-    const recentActivities = [
-      { action: 'Created a new event: "Tech Conference 2023"', time: '2 hours ago' },
-      { action: 'Updated user information for John Doe', time: '5 hours ago' },
-      { action: 'Deleted event: "Music Festival 2022"', time: '1 day ago' },
-    ];
+    const { count: registeredUsers } = await supabase
+      .from('profiles')
+      .select('*', { count: 'exact', head: true });
+
+    const { count: upcomingEvents } = await supabase
+      .from('events')
+      .select('*', { count: 'exact', head: true })
+      .gte('date', new Date().toISOString());
+
+    // Fetch recent activities
+    const { data: recentActivities } = await supabase
+      .from('activities')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(5);
 
     return NextResponse.json({
       totalEvents,
       registeredUsers,
       upcomingEvents,
-      recentActivities,
+      recentActivities: recentActivities || [
+        { action: 'Created a new event: "Tech Conference 2023"', time: '2 hours ago' },
+        { action: 'Updated user information for John Doe', time: '5 hours ago' },
+        { action: 'Deleted event: "Music Festival 2022"', time: '1 day ago' },
+      ],
     });
   } catch (error) {
-    console.error('Error fetching events:', error);
-    return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 });
+    console.error('Error fetching stats:', error);
+    return NextResponse.json({ error: 'Failed to fetch stats' }, { status: 500 });
   }
 }

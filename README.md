@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-## Eventure
-<p>Event exploration website where you can search for events </p>
-<h3>Technologies used</h3>
-<p>NextJS</p>
-=======
 # Eventure
 
 A modern event management platform built with Next.js, Supabase, and Tailwind CSS.
@@ -15,6 +9,7 @@ A modern event management platform built with Next.js, Supabase, and Tailwind CS
 - Responsive design with beautiful UI
 - Real-time updates
 - Image optimization
+- Role-based access control (Admin & User)
 
 ## Tech Stack
 
@@ -24,6 +19,37 @@ A modern event management platform built with Next.js, Supabase, and Tailwind CS
 - Tailwind CSS
 - Framer Motion
 - TypeScript
+
+## Test Credentials
+
+### Admin Account
+```
+Email: admin@eventure.com
+Password: Admin@123
+```
+
+### Regular User Account
+```
+Email: user@eventure.com
+Password: User@123
+```
+
+## User Roles & Permissions
+
+### Admin
+- Create, edit, and delete any event
+- Manage user accounts
+- Access admin dashboard
+- View analytics and reports
+- Approve/reject event submissions
+
+### Regular User
+- Browse events
+- Register for events
+- Create personal events
+- Edit own events
+- View event details
+- Manage personal profile
 
 ## Getting Started
 
@@ -51,6 +77,33 @@ npm run dev
 ```
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Database Structure
+
+### Events Table
+```sql
+create table events (
+  id uuid default uuid_generate_v4() primary key,
+  title text not null,
+  description text,
+  date timestamp with time zone,
+  seats integer,
+  image text,
+  created_at timestamp with time zone default now(),
+  user_id uuid references auth.users(id)
+);
+```
+
+### User Profiles Table
+```sql
+create table profiles (
+  id uuid references auth.users(id) primary key,
+  first_name text,
+  last_name text,
+  role text default 'user',
+  created_at timestamp with time zone default now()
+);
+```
 
 ## Deployment
 
@@ -84,6 +137,49 @@ npm run build
 npm start
 ```
 
+## Testing the Application
+
+1. **User Registration**
+   - Navigate to `/auth/register`
+   - Fill in the registration form
+   - Verify email (if required)
+
+2. **User Login**
+   - Navigate to `/auth/login`
+   - Use test credentials or your registered account
+   - Test "Remember me" functionality
+   - Test password reset flow
+
+3. **Event Management**
+   - Create a new event
+   - Edit event details
+   - Upload event images
+   - Set event capacity
+   - Manage registrations
+
+4. **Admin Features**
+   - Access admin dashboard
+   - Manage user accounts
+   - Review event submissions
+   - Generate reports
+
+## Common Issues & Solutions
+
+1. **Image Upload Issues**
+   - Ensure proper image format (JPG, PNG)
+   - Check file size limits
+   - Verify image URL accessibility
+
+2. **Authentication Problems**
+   - Clear browser cache
+   - Check email verification status
+   - Verify environment variables
+
+3. **Database Connection**
+   - Verify Supabase credentials
+   - Check network connectivity
+   - Ensure proper table structure
+
 ## Contributing
 
 1. Fork the repository
@@ -95,4 +191,17 @@ npm start
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
->>>>>>> 000b60b (more pages)
+
+## Support
+
+For support, please:
+1. Check the documentation
+2. Search existing issues
+3. Create a new issue with detailed information about your problem
+
+## Acknowledgments
+
+- Next.js team for the amazing framework
+- Supabase for the backend infrastructure
+- Tailwind CSS for the styling system
+- All contributors who have helped shape this project
