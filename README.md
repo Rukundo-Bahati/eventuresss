@@ -56,7 +56,7 @@ Password: User@123
 1. Clone the repository:
 ```bash
 git clone https://github.com/Rukundo-Bahati/eventuresss.git
-cd eventure
+cd eventuresss
 ```
 
 2. Install dependencies:
